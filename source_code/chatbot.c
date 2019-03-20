@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "chat1002.h"
+#include "kb.h"
  
  
 /*
@@ -232,11 +233,7 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_reset(const char *intent) {
-	
-	/* to be implemented */
-	
-	return 0;
-	
+	return compare_token(intent, "reset") == 0;
 }
 
 
@@ -250,9 +247,8 @@ int chatbot_is_reset(const char *intent) {
  *   0 (the chatbot always continues chatting after beign reset)
  */
 int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
-	
-	/* to be implemented */
-	 
+	knowledge_reset();
+	snprintf(response, n, "I have reset my knowledge for this session.");
 	return 0;
 	 
 }

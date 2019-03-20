@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "chat1002.h"
+#include "kb.h"
+
 
 /*
  * Get the response to a question.
@@ -81,12 +83,12 @@ int knowledge_read(FILE *f) {
 
 
 /*
- * Reset the knowledge base, removing all know entitities from all intents.
+ * Reset the knowledge base, removing all know entities from all intents.
  */
 void knowledge_reset() {
-	
-	/* to be implemented */
-	
+	linkedlist_free(head_what);
+	linkedlist_free(head_where);
+	linkedlist_free(head_who);
 }
 
 
