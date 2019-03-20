@@ -19,8 +19,8 @@ node_t *head_where = NULL;
 node_t *head_who = NULL;
 
 
-node_t * node_create(char *str);
-void linkedlist_add(node_t *head, node_t *node)
+node_t * node_create(char *intent, char *entity, char *resp);
+void linkedlist_add(node_t *head, node_t *node);
 void linkedlist_free(node_t *node);
 
 

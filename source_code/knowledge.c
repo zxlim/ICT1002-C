@@ -34,11 +34,8 @@
  *   KB_INVALID, if 'intent' is not a recognised question word
  */
 int knowledge_get(const char *intent, const char *entity, char *response, int n) {
-	
 	/* to be implemented */
-	
 	return KB_NOTFOUND;
-	
 }
 
 
@@ -58,11 +55,38 @@ int knowledge_get(const char *intent, const char *entity, char *response, int n)
  *   KB_INVALID, if the intent is not a valid question word
  */
 int knowledge_put(const char *intent, const char *entity, const char *response) {
-	
-	/* to be implemented */
-	
-	return KB_INVALID;
-	
+	node_t *head, *new_node = NULL;
+
+	if (compare_token(intent, "what") == 0) {
+		// Intent is what.
+		head = head_what;
+	} else if (compare_token(intent, "where") == 0) {
+		// Intent is where.
+		head = head_where;
+	} else if (compare_token(intent, "who") == 0) {
+		// Intent is who.
+		head = head_who;
+	} else {
+		// Invalid intent.
+		return KB_INVALID;
+	}
+
+	new_node = node_create(intent, entity, response);
+
+	if (new_node == NULL) {
+		// Failed to allocate memory.
+		return KB_NOMEM;
+	}
+
+	if (head == NULL) {
+		// First node in the linked list.
+		head = new_node;
+	} else {
+		// Continue the linked list.
+		linkedlist_add(head, new_node);
+	}
+
+	return KB_FOUND;
 }
 
 
@@ -75,9 +99,7 @@ int knowledge_put(const char *intent, const char *entity, const char *response) 
  * Returns: the number of entity/response pairs successful read from the file
  */
 int knowledge_read(FILE *f) {
-	
 	/* to be implemented */
-	
 	return 0;
 }
 
@@ -99,7 +121,5 @@ void knowledge_reset() {
  *   f - the file
  */
 void knowledge_write(FILE *f) {
-	
 	/* to be implemented */
-	
 }

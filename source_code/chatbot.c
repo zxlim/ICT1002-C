@@ -52,9 +52,7 @@
  * Returns: the name of the chatbot as a null-terminated string
  */
 const char *chatbot_botname() {
-
 	return "Chatbot";
-	
 }
 
 
@@ -64,9 +62,7 @@ const char *chatbot_botname() {
  * Returns: the name of the user as a null-terminated string
  */
 const char *chatbot_username() {
-
 	return "User";
-	
 }
 
 
@@ -105,7 +101,6 @@ int chatbot_main(int inc, char *inv[], char *response, int n) {
 		snprintf(response, n, "I don't understand \"%s\".", inv[0]);
 		return 0;
 	}
-
 }
 
 
@@ -120,9 +115,7 @@ int chatbot_main(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_exit(const char *intent) {
-	
 	return compare_token(intent, "exit") == 0 || compare_token(intent, "quit") == 0;
-	
 }
 
 
@@ -136,11 +129,8 @@ int chatbot_is_exit(const char *intent) {
  *   0 (the chatbot always continues chatting after a question)
  */
 int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
-	 
 	snprintf(response, n, "Goodbye!");
-	 
 	return 1;
-	 
 }
 
 
@@ -155,11 +145,7 @@ int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_load(const char *intent) {
-	
-	/* to be implemented */
-	
-	return 0;
-	
+	return compare_token(intent, "load") == 0;
 }
 
 
@@ -173,11 +159,8 @@ int chatbot_is_load(const char *intent) {
  *   0 (the chatbot always continues chatting after loading knowledge)
  */
 int chatbot_do_load(int inc, char *inv[], char *response, int n) {
-	
 	/* to be implemented */
-	 
 	return 0;
-	 
 }
 
 
@@ -192,11 +175,8 @@ int chatbot_do_load(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_question(const char *intent) {
-	
 	/* to be implemented */
-	
 	return 0;
-	
 }
 
 
@@ -214,11 +194,8 @@ int chatbot_is_question(const char *intent) {
  *   0 (the chatbot always continues chatting after a question)
  */
 int chatbot_do_question(int inc, char *inv[], char *response, int n) {
-	
 	/* to be implemented */
-	 
 	return 0;
-	 
 }
 
 
@@ -250,7 +227,6 @@ int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
 	knowledge_reset();
 	snprintf(response, n, "I have reset my knowledge for this session.");
 	return 0;
-	 
 }
 
 
@@ -265,11 +241,8 @@ int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_save(const char *intent) {
-	
 	/* to be implemented */
-	
 	return 0;
-	
 }
 
 
@@ -283,11 +256,8 @@ int chatbot_is_save(const char *intent) {
  *   0 (the chatbot always continues chatting after saving knowledge)
  */
 int chatbot_do_save(int inc, char *inv[], char *response, int n) {
-	
 	/* to be implemented */
-	
 	return 0;
-	 
 }
  
  
@@ -303,11 +273,8 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_smalltalk(const char *intent) {
-	
 	/* to be implemented */
-	
 	return 0;
- 
 }
 
 
@@ -322,10 +289,6 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	
 	/* to be implemented */
-	
 	return 0;
-	
 }
-  
