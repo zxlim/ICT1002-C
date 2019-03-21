@@ -12,12 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "chat1002.h"
-#include "kb.h"
 
 /* word delimiters */
 const char *delimiters = " ?\t\n";
- 
- 
+
+
 /*
  * Main loop.
  */

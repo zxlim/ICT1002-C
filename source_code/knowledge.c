@@ -16,7 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "chat1002.h"
-#include "kb.h"
+extern node_t *head_what;
+extern node_t *head_where;
+extern node_t *head_who;
 
 
 /*
@@ -55,38 +57,23 @@ int knowledge_get(const char *intent, const char *entity, char *response, int n)
  *   KB_INVALID, if the intent is not a valid question word
  */
 int knowledge_put(const char *intent, const char *entity, const char *response) {
-	node_t *head, *new_node = NULL;
+	int result;
 
 	if (compare_token(intent, "what") == 0) {
 		// Intent is what.
-		head = head_what;
+		result = kb_update_what(node_create(entity, response));
 	} else if (compare_token(intent, "where") == 0) {
 		// Intent is where.
-		head = head_where;
+		result = kb_update_where(node_create(entity, response));
 	} else if (compare_token(intent, "who") == 0) {
 		// Intent is who.
-		head = head_who;
+		result = kb_update_who(node_create(entity, response));
 	} else {
 		// Invalid intent.
-		return KB_INVALID;
+		result = KB_INVALID;
 	}
 
-	new_node = node_create(intent, entity, response);
-
-	if (new_node == NULL) {
-		// Failed to allocate memory.
-		return KB_NOMEM;
-	}
-
-	if (head == NULL) {
-		// First node in the linked list.
-		head = new_node;
-	} else {
-		// Continue the linked list.
-		linkedlist_add(head, new_node);
-	}
-
-	return KB_FOUND;
+	return result;
 }
 
 
@@ -99,8 +86,55 @@ int knowledge_put(const char *intent, const char *entity, const char *response) 
  * Returns: the number of entity/response pairs successful read from the file
  */
 int knowledge_read(FILE *f) {
-	/* to be implemented */
-	return 0;
+	/*
+		ctr:	The number of successful results retrieved from the file.
+		result:	The result of inserting the entity-response into the knowledge base.
+		line:	The buffer to store content of the file.
+	*/
+	int ctr = 0, result;
+	char line[MAX_INPUT];
+	char *f_intent, *f_entity, *f_response;
+
+	while (fgets(line, MAX_INPUT, (FILE*) f)) {
+		// Read line by line.
+		if (strcmp(line, "\n") == 0 || strcmp(line, "\r\n") == 0) {
+			// Empty line.
+			continue;
+		} else {
+			// Remove the new line.
+			size_t pos = (int)(strlen(line)) - 2;
+			if (compare_token(&line[pos], "\r")) {
+				// \r\n.
+				line[pos] = '\0';
+			} else {
+				// Only \n.
+				line[pos + 1] = '\0';
+			}
+
+			if (compare_token(line, "[what]") == 0) {
+				// Intent: what.
+				f_intent = "what";
+			} else if (compare_token(line, "[where]") == 0) {
+				// Intent: where.
+				f_intent = "where";
+			} else if (compare_token(line, "[who]") == 0) {
+				// Intent: who.
+				f_intent = "who";
+			} else {
+				// Entity-Response pair line.
+				f_entity = strtok(line, "=");
+				f_response = strtok(NULL, "=");
+				result = knowledge_put(f_intent, f_entity, f_response);
+
+				if (result == KB_FOUND) {
+					// Increment the successful counter.
+					ctr++;
+				}
+			}
+		}
+	}
+
+	return ctr;
 }
 
 
@@ -111,6 +145,10 @@ void knowledge_reset() {
 	linkedlist_free(head_what);
 	linkedlist_free(head_where);
 	linkedlist_free(head_who);
+
+	head_what = NULL;
+	head_where = NULL;
+	head_who = NULL;
 }
 
 

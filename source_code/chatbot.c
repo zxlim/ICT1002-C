@@ -43,8 +43,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "chat1002.h"
-#include "kb.h"
- 
+extern node_t *head_what;
+extern node_t *head_where;
+extern node_t *head_who;
+
  
 /*
  * Get the name of the chatbot.
@@ -97,6 +99,8 @@ int chatbot_main(int inc, char *inv[], char *response, int n) {
 		return chatbot_do_reset(inc, inv, response, n);
 	else if (chatbot_is_save(inv[0]))
 		return chatbot_do_save(inc, inv, response, n);
+	else if (chatbot_is_debug(inv[0]))
+		return chatbot_do_debug(inc, inv, response, n);
 	else {
 		snprintf(response, n, "I don't understand \"%s\".", inv[0]);
 		return 0;
@@ -133,7 +137,6 @@ int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
 	return 1;
 }
 
-
 /*
  * Determine whether an intent is LOAD.
  *
@@ -159,7 +162,36 @@ int chatbot_is_load(const char *intent) {
  *   0 (the chatbot always continues chatting after loading knowledge)
  */
 int chatbot_do_load(int inc, char *inv[], char *response, int n) {
-	/* to be implemented */
+	/*
+		fp:		The file pointer.
+		ctr:	The number of successful results retrieved from the file.
+	*/
+	FILE *fp;
+	int ctr = 0;
+	char file_path[MAX_INPUT];
+
+	// Get the file path from the user input.
+	if (compare_token(inv[1], "from") == 0) {
+		// LOAD[0] from[1] /path/to/file[2]
+		strcpy(file_path, inv[2]);
+	} else {
+		// LOAD[0] /path/to/file[1]
+		strcpy(file_path, inv[1]);
+	}
+
+	// Open the file in read mode.
+	fp = fopen(file_path, "r");
+
+	if (fp != NULL) {
+		// File exists.
+		ctr = knowledge_read(fp);
+		fclose(fp);
+		snprintf(response, n, "I have loaded %d results from the knowledge base [%s].", ctr, file_path);
+	} else {
+		// File does not exist.
+		snprintf(response, n, "Sorry, I can't load the knowledge base [%s].", file_path);
+	}
+
 	return 0;
 }
 
@@ -290,5 +322,27 @@ int chatbot_is_smalltalk(const char *intent) {
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
 	/* to be implemented */
+	return 0;
+}
+
+
+/*
+ * Temporary debug functions.
+*/
+int chatbot_is_debug(const char *intent) {
+	return compare_token(intent, "tempdebug") == 0;
+}
+
+int chatbot_do_debug(int inc, char *inv[], char *response, int n) {
+	printf("\n=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+	printf("==========[what]===========\n");
+	linkedlist_print(head_what);
+	printf("==========[where]==========\n");
+	linkedlist_print(head_where);
+	printf("===========[who]===========\n");
+	linkedlist_print(head_who);
+	printf("===========================\n\n");
+	printf("=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+	snprintf(response, n, "Done printing debugging information.");
 	return 0;
 }
