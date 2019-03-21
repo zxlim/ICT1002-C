@@ -47,7 +47,7 @@ extern node_t *head_what;
 extern node_t *head_where;
 extern node_t *head_who;
 
- 
+
 /*
  * Get the name of the chatbot.
  *
