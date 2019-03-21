@@ -16,13 +16,12 @@
 
 /* word delimiters */
 const char *delimiters = " ?\t\n";
- 
- 
+
+
 /*
  * Main loop.
  */
 int main(int argc, char *argv[]) {
-
 	char input[MAX_INPUT];      /* buffer for holding the user input */
 	int inc;                    /* the number of words in the user input */
 	char *inv[MAX_INPUT];       /* pointers to the beginning of each word of input */
@@ -67,7 +66,6 @@ int main(int argc, char *argv[]) {
 		/* invoke the chatbot */
 		done = chatbot_main(inc, inv, output, MAX_RESPONSE);
 		printf("%s: %s\n", chatbot_botname(), output);
-		
 	} while (!done);
 	
 	return 0;
@@ -85,7 +83,6 @@ int main(int argc, char *argv[]) {
  *   as strcmp()
  */
 int compare_token(const char *token1, const char *token2) {
-	
 	int i = 0;
 	while (token1[i] != '\0' && token2[i] != '\0') {
 		if (toupper(token1[i]) < toupper(token2[i]))
@@ -101,7 +98,6 @@ int compare_token(const char *token1, const char *token2) {
 		return -1;
 	else
 		return 1;
-	
 }
 
 
@@ -115,7 +111,6 @@ int compare_token(const char *token1, const char *token2) {
  *   ...    - as printf
  */
 void prompt_user(char *buf, int n, const char *format, ...) {
-	
 	/* print the prompt */
 	va_list args;
 	va_start(args, format);

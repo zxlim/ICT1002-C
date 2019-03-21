@@ -26,14 +26,14 @@ X        = .exe
 #
 # Use the following settings for GNU compilers (gcc).
 #
-#CC       = gcc
-#CFLAGS   = -c -o
-#LD       = gcc
-#LDFLAGS  = -o 
-#LDLIBS   =
-#RM       = rm -f
-#O        = .o
-#X        =
+# CC       = gcc
+# CFLAGS   = -c -o
+# LD       = gcc
+# LDFLAGS  = -o 
+# LDLIBS   =
+# RM       = rm -f
+# O        = .o
+# X        =
 
 
 ###############################################################################
@@ -42,11 +42,14 @@ X        = .exe
 #
 ###############################################################################
 
-chat1002$(X): chatbot$(O) knowledge$(O) main$(O)
-	$(LD) $(LDFLAGS)chat1002$(X) chatbot$(O) knowledge$(O) main$(O) $(LDLIBS)
+chat1002$(X): chatbot$(O) kb$(O) knowledge$(O) main$(O)
+	$(LD) $(LDFLAGS)chat1002$(X) chatbot$(O) kb$(O) knowledge$(O) main$(O) $(LDLIBS)
 
 chatbot$(O): chatbot.c chat1002.h
 	$(CC) $(CFLAGS) chatbot$(O) chatbot.c
+
+kb$(O): kb.c chat1002.h
+	$(CC) $(CFLAGS) kb$(O) kb.c
 
 knowledge$(O): knowledge.c chat1002.h
 	$(CC) $(CFLAGS) knowledge$(O) knowledge.c

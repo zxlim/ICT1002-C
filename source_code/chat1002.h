@@ -27,6 +27,15 @@
 #define KB_NOTFOUND -1
 #define KB_INVALID  -2
 #define KB_NOMEM    -3
+
+
+/* Intent-Entity-Response struct. */
+typedef struct node_struct {
+	char intent[MAX_INTENT];
+	char entity[MAX_ENTITY];
+	char response[MAX_RESPONSE];
+	struct node_struct *next; // Pointer to the next node in the linked list.
+} node_t;
  
 /* functions defined in main.c */
 int compare_token(const char *token1, const char *token2);
@@ -49,11 +58,33 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n);
 int chatbot_is_smalltalk(const char *intent);
 int chatbot_do_smalltalk(int inc, char *inv[], char *resonse, int n);
 
+/* Temporary debug functions. */
+int chatbot_is_debug(const char *intent);
+int chatbot_do_debug(int inc, char *inv[], char *response, int n);
+/* End of temporary debug functions. */
+
 /* functions defined in knowledge.c */
 int knowledge_get(const char *intent, const char *entity, char *response, int n);
 int knowledge_put(const char *intent, const char *entity, const char *response);
 void knowledge_reset();
 int knowledge_read(FILE *f);
 void knowledge_write(FILE *f);
+
+/* Functions defined in kb.c */
+node_t * node_create(const char *entity, const char *resp);
+void linkedlist_add(node_t *head, node_t *node);
+void linkedlist_print(node_t *head);
+void linkedlist_free(node_t *node);
+int kb_update_what(node_t *new_node);
+int kb_update_where(node_t *new_node);
+int kb_update_who(node_t *new_node);
+
+/*
+	Linked lists.
+	Use "extern" to mark external variable.
+*/
+node_t *head_what;
+node_t *head_where;
+node_t *head_who;
 
 #endif
