@@ -31,7 +31,6 @@
 
 /* Intent-Entity-Response struct. */
 typedef struct node_struct {
-	char intent[MAX_INTENT];
 	char entity[MAX_ENTITY];
 	char response[MAX_RESPONSE];
 	struct node_struct *next; // Pointer to the next node in the linked list.

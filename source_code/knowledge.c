@@ -103,11 +103,14 @@ int knowledge_read(FILE *f) {
 		} else {
 			// Remove the new line.
 			size_t pos = (int)(strlen(line)) - 2;
-			if (compare_token(&line[pos], "\r")) {
-				// \r\n.
+			if (compare_token(&line[pos], "\r") == 0) {
+				// macOS/ Linux: \r\n.
+				line[pos] = '\0';
+			} else if (compare_token(&line[pos], "\n") == 0) {
+				// Windows: \n.
 				line[pos] = '\0';
 			} else {
-				// Only \n.
+				// macOS/ Linux: Only \n.
 				line[pos + 1] = '\0';
 			}
 
