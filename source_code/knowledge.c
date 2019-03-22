@@ -106,11 +106,8 @@ int knowledge_read(FILE *f) {
 			if (compare_token(&line[pos], "\r") == 0) {
 				// macOS/ Linux: \r\n.
 				line[pos] = '\0';
-			} else if (compare_token(&line[pos], "\n") == 0) {
-				// Windows: \n.
-				line[pos] = '\0';
 			} else {
-				// macOS/ Linux: Only \n.
+				// Only \n.
 				line[pos + 1] = '\0';
 			}
 
