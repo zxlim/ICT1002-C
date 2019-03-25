@@ -42,6 +42,7 @@
  
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "chat1002.h"
 extern node_t *head_what;
 extern node_t *head_where;
@@ -305,10 +306,18 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_smalltalk(const char *intent) {
-	/* to be implemented */
+	
+	char *smalltalk[]= {"good","bye","hello","it's","hi"};
+	
+	for (int i =0; i<5;i++)
+	{
+		if(compare_token(intent, smalltalk[i]) == 0)
+		{
+			return 1;
+		}
+	}
 	return 0;
 }
-
 
 /*
  * Respond to smalltalk.
@@ -321,7 +330,37 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	/* to be implemented */
+	char *random_bye[] = {"Bye Bye","See you again!"};
+	char *random_hi[] = {"Hi","Hello","What's Up!"};
+	int hi_rand_num;
+	int bye_rand_num;
+	
+	for (int i=0; i<2;i++)
+	{
+		bye_rand_num = rand() %2;
+	}
+	
+	for (int i=0; i<3;i++)
+	{
+		hi_rand_num = rand() %3;
+	}
+	
+	if(compare_token("good", inv[0])==0)
+	{
+		snprintf(response,n,"Good %s",inv[1]);
+	}
+	else if(compare_token("bye", inv[0])==0)
+	{
+		snprintf(response,n,random_bye[bye_rand_num]);
+	}
+	else if(compare_token("hello", inv[0])==0 || compare_token("hi", inv[0])==0)
+	{
+		snprintf(response,n,random_hi[hi_rand_num]);
+	}
+	else if(compare_token("it's", inv[0])==0)
+	{
+		snprintf(response,n,"Indeed it is.");
+	}
 	return 0;
 }
 
