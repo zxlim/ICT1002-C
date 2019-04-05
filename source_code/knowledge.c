@@ -159,5 +159,26 @@ void knowledge_reset() {
  *   f - the file
  */
 void knowledge_write(FILE *f) {
-	/* to be implemented */
+	/*
+		ctr:	The number of successful results saved to the file.
+	*/
+	int ctr = 0;
+	node_t * temp1 = head_what;
+	node_t * temp2 = head_where;
+	node_t * temp3 = head_who;
+	fprintf (f, "[what]\n");
+	while(temp1 != NULL){
+		fprintf (f,"%s=%s\n",temp1->entity,temp1->response);
+		temp1 = temp1->next;
+	}
+	fprintf (f, "[where]\n");
+	while(temp2 != NULL){
+		fprintf (f,"%s=%s\n",temp2->entity,temp2->response);
+		temp2=temp2->next;
+	}
+	fprintf (f, "[who]\n");
+	while(temp3 != NULL){
+		fprintf (f,"%s=%s\n",temp3->entity,temp3->response);
+		temp3=temp3->next;
+	}
 }

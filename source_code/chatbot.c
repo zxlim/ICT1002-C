@@ -349,8 +349,7 @@ int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_save(const char *intent) {
-	/* to be implemented */
-	return 0;
+	return compare_token(intent, "save") == 0;
 }
 
 
@@ -364,7 +363,35 @@ int chatbot_is_save(const char *intent) {
  *   0 (the chatbot always continues chatting after saving knowledge)
  */
 int chatbot_do_save(int inc, char *inv[], char *response, int n) {
-	/* to be implemented */
+	/*
+		fp:		The file pointer.
+		ctr:	The number of successful results retrieved from the file.
+	*/
+	FILE *fp;
+	int ctr = 0;
+	char file_path[MAX_INPUT];
+
+	// Get the file path from the user input.
+	if (compare_token(inv[1], "to") == 0) {
+		// Save[0] to[1] /path/to/file[2]
+		strcpy(file_path, inv[2]);
+	} else {
+		// save[0] /path/to/file[1]
+		strcpy(file_path, inv[1]);
+	}
+
+	// Open the file in write mode.
+	fp = fopen(file_path, "w");
+
+	if (fp != NULL) {
+		// File exists.
+		knowledge_write(fp);
+		fclose(fp);
+		snprintf(response, n, "I have saved the results from the knowledge base to [%s].", file_path);
+	} else {
+		// File does not exist.
+		snprintf(response, n, "Sorry, I can't save the knowledge base to [%s].", file_path);
+	}
 	return 0;
 }
  
