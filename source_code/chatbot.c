@@ -208,8 +208,7 @@ int chatbot_do_load(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_question(const char *intent) {
-	/* to be implemented */
-	return 0;
+	return compare_token(intent, "what") == 0 || compare_token(intent, "where") == 0 || compare_token(intent, "who") == 0;
 }
 
 
@@ -227,7 +226,49 @@ int chatbot_is_question(const char *intent) {
  *   0 (the chatbot always continues chatting after a question)
  */
 int chatbot_do_question(int inc, char *inv[], char *response, int n) {
-	/* to be implemented */
+	/*
+		temp: 		A temp pointer to point to the start of the linked list.
+		enti:		A string to store the entity.
+	*/
+	node_t *temp;
+	char enti[MAX_INPUT] = "";
+	
+	// Assign the temp to the linked list based on the question word.
+	if (compare_token(inv[0], "what") == 0){
+		temp = head_what;
+	} else if (compare_token(inv[0], "where") == 0){
+		temp = head_where;
+	} else if (compare_token(inv[0], "who") == 0){
+		temp = head_who;
+	}
+	
+	// Store the entity as "enti" variable.
+	for (int i = 2; i < inc; i++){
+		strcat(enti, inv[i]);
+		if (i != inc - 1){
+			strcat(enti, " ");
+		}
+	}
+	
+	// Loop the temp linked list to search for the entity.
+	while(temp->next!=NULL){
+		// If entity is found inside the database.
+		if (compare_token(enti, temp->entity) == 0){
+			snprintf(response, n, temp->response);
+			break;
+		}
+		temp = temp->next;
+	}
+	
+	// The last item in the linked list.
+	if (compare_token(enti, temp->entity) == 0){
+		snprintf(response, n, temp->response);
+	} else {
+		// There is no such item in our database. 
+		// Push to the ask user for answer function.
+		snprintf(response, n, enti);
+	}
+	
 	return 0;
 }
 
