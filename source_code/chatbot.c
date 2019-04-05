@@ -228,27 +228,48 @@ int chatbot_is_question(const char *intent) {
 int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 	/*
 		temp: 		A temp pointer to point to the start of the linked list.
+		w_ques:		A string to store the question word.
 		enti:		A string to store the entity.
+		unsure:		A string for unsure questions.
+		ans:		A string to store the answer to the question.
 	*/
 	node_t *temp;
+	char w_ques[MAX_INPUT] = "";
 	char enti[MAX_INPUT] = "";
+	char unsure[MAX_INPUT] = "I don't know. ";
+	char ans[MAX_INPUT] = "";
+	int alen;
 	
 	// Assign the temp to the linked list based on the question word.
 	if (compare_token(inv[0], "what") == 0){
+		strcat(w_ques, "what");
 		temp = head_what;
 	} else if (compare_token(inv[0], "where") == 0){
+		strcat(w_ques, "where");
 		temp = head_where;
 	} else if (compare_token(inv[0], "who") == 0){
+		strcat(w_ques, "who");
 		temp = head_who;
 	}
 	
-	// Store the entity as "enti" variable.
-	for (int i = 2; i < inc; i++){
-		strcat(enti, inv[i]);
-		if (i != inc - 1){
-			strcat(enti, " ");
+	// Validation
+	if (compare_token(inv[1], "is") == 0 || compare_token(inv[1], "are") == 0){
+		// Store the entity as "enti" variable.
+		for (int i = 2; i < inc; i++){
+			strcat(enti, inv[i]);
+			if (i != inc - 1){
+				strcat(enti, " ");
+			}
 		}
-	}
+	} else{
+		// Store the entity as "enti" variable.
+		for (int i = 1; i < inc; i++){
+			strcat(enti, inv[i]);
+			if (i != inc - 1){
+				strcat(enti, " ");
+			}
+		}
+	}	
 	
 	// Loop the temp linked list to search for the entity.
 	while(temp->next!=NULL){
@@ -264,9 +285,22 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 	if (compare_token(enti, temp->entity) == 0){
 		snprintf(response, n, temp->response);
 	} else {
-		// There is no such item in our database. 
-		// Push to the ask user for answer function.
-		snprintf(response, n, enti);
+		// No such entity found inside the database.
+		for (int i = 0; i < inc; i++){
+			// Form string to ask for user input.
+			strcat(unsure, inv[i]);
+			if (i != inc - 1){
+				strcat(unsure, " ");
+			}
+		}
+		printf("%s: %s\n", chatbot_botname(), unsure);
+		printf("%s: ", chatbot_username());
+		fgets(ans, MAX_INPUT, stdin);
+		alen = strlen(ans);
+		if( ans[alen-1] == '\n' )
+			ans[alen-1] = 0;
+		snprintf(response, n, "Thank you.");
+		knowledge_put(w_ques, enti, ans);
 	}
 	
 	return 0;
