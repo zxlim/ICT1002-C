@@ -313,6 +313,9 @@ int chatbot_is_reset(const char *intent) {
  *   0 (the chatbot always continues chatting after beign reset)
  */
 int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
+	// Reseed the random number generator.
+	srand((unsigned)(time(NULL)));
+	// Reset the knowledge base in memory.
 	knowledge_reset();
 	snprintf(response, n, "I have reset my knowledge for this session.");
 	return 0;
@@ -412,15 +415,13 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	size_t rand_temp, rand_int;
+	size_t rand_int;
 	const char *random_hi[] = {"Hi!", "Hello!", "Hey there!", "What's Up?"};
 	const char *random_can[] = {
 		"I don't know. Can I?", "What do you think?", "Maybe I could!", "I could always try..."
 	};
-	
-	srand((unsigned)(time(NULL)));
-	rand_temp = rand();
-	rand_int = (rand() * rand_temp) % 4;
+
+	rand_int = (size_t)(rand() % 4);
 	
 	if (compare_token("time", inv[0]) == 0) {
 		char the_time[24];
