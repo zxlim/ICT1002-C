@@ -26,8 +26,8 @@ node_t * node_create(const char *entity, const char *resp) {
 		return NULL;
 	}
 
-	strcpy(node->entity, entity);
-	strcpy(node->response, resp);
+	strncpy(node->entity, entity, MAX_ENTITY);
+	strncpy(node->response, resp, MAX_RESPONSE);
 	node->next = NULL;
 
 	return node;
@@ -45,7 +45,10 @@ void linkedlist_add(node_t *head, node_t *node) {
 	node_t *current = head;
 
 	while (current != NULL) {
-		if (current->next == NULL) {
+		if (compare_token(current->entity, node->entity) == 0) {
+			// Entity already exist. Overwrite the response.
+			strncpy(current->response, node->response, MAX_RESPONSE);
+		} else if (current->next == NULL) {
 			// End of linked list.
 			current->next = node;
 			break;
@@ -59,6 +62,7 @@ void linkedlist_add(node_t *head, node_t *node) {
 void linkedlist_print(node_t *head) {
 	/*
 		This function prints out the word value of all nodes in a linked list.
+		For debugging use only.
 
 		Arguments:
 			head 	[node_t *]:	The head node of the linked list.

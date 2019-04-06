@@ -134,6 +134,8 @@ int chatbot_is_exit(const char *intent) {
  *   0 (the chatbot always continues chatting after a question)
  */
 int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
+	// Free the allocated memory.
+	knowledge_reset();
 	snprintf(response, n, "Goodbye!");
 	return 1;
 }
@@ -227,80 +229,58 @@ int chatbot_is_question(const char *intent) {
  */
 int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 	/*
-		temp: 		A temp pointer to point to the start of the linked list.
-		w_ques:		A string to store the question word.
-		enti:		A string to store the entity.
 		unsure:		A string for unsure questions.
+		enti:		A string to store the entity.
 		ans:		A string to store the answer to the question.
 	*/
-	node_t *temp;
-	char w_ques[MAX_INPUT] = "";
-	char enti[MAX_INPUT] = "";
-	char unsure[MAX_INPUT] = "I don't know. ";
-	char ans[MAX_INPUT] = "";
-	int alen;
+	int i = 1;
+	char unsure[MAX_RESPONSE] = "I don't know. ";
+	char enti[MAX_ENTITY] = "";
+	char ans[MAX_RESPONSE] = "";
 	
-	// Assign the temp to the linked list based on the question word.
-	if (compare_token(inv[0], "what") == 0){
-		strcat(w_ques, "what");
-		temp = head_what;
-	} else if (compare_token(inv[0], "where") == 0){
-		strcat(w_ques, "where");
-		temp = head_where;
-	} else if (compare_token(inv[0], "who") == 0){
-		strcat(w_ques, "who");
-		temp = head_who;
+	// Check where does the question start.
+	if (compare_token(inv[1], "is") == 0 || compare_token(inv[1], "are") == 0) {
+		i = 2;
 	}
-	
-	// Validation
-	if (compare_token(inv[1], "is") == 0 || compare_token(inv[1], "are") == 0){
-		// Store the entity as "enti" variable.
-		for (int i = 2; i < inc; i++){
+
+	// Store the entity as "enti" variable.
+	for (; i < inc; i++) {
+		size_t after_check = (size_t)(strlen(enti) + strlen(inv[i]));
+
+		if (after_check < MAX_ENTITY) {
+			// "enti" still has space for the next word.
 			strcat(enti, inv[i]);
-			if (i != inc - 1){
+
+			if (i != (inc - 1)) {
+				// Add a space between words.
 				strcat(enti, " ");
 			}
-		}
-	} else{
-		// Store the entity as "enti" variable.
-		for (int i = 1; i < inc; i++){
-			strcat(enti, inv[i]);
-			if (i != inc - 1){
-				strcat(enti, " ");
+		} else {
+			// Not enough space to store the word and subsequent words.
+			size_t remainder = (size_t)(MAX_ENTITY - (int)(strlen(enti)));
+			if (remainder > 0) {
+				strncat(enti, inv[i], remainder);
 			}
-		}
-	}	
-	
-	// Loop the temp linked list to search for the entity.
-	while(temp->next!=NULL){
-		// If entity is found inside the database.
-		if (compare_token(enti, temp->entity) == 0){
-			snprintf(response, n, temp->response);
 			break;
 		}
-		temp = temp->next;
 	}
-	
-	// The last item in the linked list.
-	if (compare_token(enti, temp->entity) == 0){
-		snprintf(response, n, temp->response);
-	} else {
-		// No such entity found inside the database.
-		for (int i = 0; i < inc; i++){
-			// Form string to ask for user input.
-			strcat(unsure, inv[i]);
-			if (i != inc - 1){
+
+	if (knowledge_get(inv[0], enti, response, n) == KB_NOTFOUND) {
+		// Can't find response. Form string to ask for response.
+		for (int j = 0; j < inc; j++) {
+			strcat(unsure, inv[j]);
+
+			if (j != (inc - 1)) {
+				// Add a space between words.
 				strcat(unsure, " ");
 			}
 		}
-		printf("%s: %s\n", chatbot_botname(), unsure);
-		printf("%s: ", chatbot_username());
-		fgets(ans, MAX_INPUT, stdin);
-		alen = strlen(ans);
-		if( ans[alen-1] == '\n' )
-			ans[alen-1] = 0;
+		// Account for question mark at end of string.
+		strcat(unsure, "?");
+
+		prompt_user(ans, MAX_RESPONSE, "%s", unsure);
+		knowledge_put(inv[0], enti, ans);
 		snprintf(response, n, "Thank you.");
-		knowledge_put(w_ques, enti, ans);
 	}
 	
 	return 0;
@@ -408,13 +388,10 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_smalltalk(const char *intent) {
+	char *smalltalk[] = {"good", "bye", "hello", "it's", "hi"};
 	
-	char *smalltalk[]= {"good","bye","hello","it's","hi"};
-	
-	for (int i =0; i<5;i++)
-	{
-		if(compare_token(intent, smalltalk[i]) == 0)
-		{
+	for (int i =0; i<5; i++) {
+		if (compare_token(intent, smalltalk[i]) == 0) {
 			return 1;
 		}
 	}
@@ -432,36 +409,27 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	char *random_bye[] = {"Bye Bye","See you again!"};
-	char *random_hi[] = {"Hi","Hello","What's Up!"};
+	char *random_bye[] = {"Bye Bye", "See you again!"};
+	char *random_hi[] = {"Hi", "Hello", "What's Up!"};
 	int hi_rand_num;
 	int bye_rand_num;
 	
-	for (int i=0; i<2;i++)
-	{
+	for (int i=0; i<2;i++) {
 		bye_rand_num = rand() %2;
 	}
 	
-	for (int i=0; i<3;i++)
-	{
+	for (int i=0; i<3;i++) {
 		hi_rand_num = rand() %3;
 	}
 	
-	if(compare_token("good", inv[0])==0)
-	{
-		snprintf(response,n,"Good %s",inv[1]);
-	}
-	else if(compare_token("bye", inv[0])==0)
-	{
-		snprintf(response,n,random_bye[bye_rand_num]);
-	}
-	else if(compare_token("hello", inv[0])==0 || compare_token("hi", inv[0])==0)
-	{
-		snprintf(response,n,random_hi[hi_rand_num]);
-	}
-	else if(compare_token("it's", inv[0])==0)
-	{
-		snprintf(response,n,"Indeed it is.");
+	if (compare_token("good", inv[0]) == 0) {
+		snprintf(response, n, "Good %s", inv[1]);
+	} else if (compare_token("bye", inv[0]) == 0) {
+		snprintf(response, n, "%s" , random_bye[bye_rand_num]);
+	} else if (compare_token("hello", inv[0]) == 0 || compare_token("hi", inv[0]) == 0) {
+		snprintf(response, n, "%s" , random_hi[hi_rand_num]);
+	} else if (compare_token("it's", inv[0])==0) {
+		snprintf(response, n, "Indeed it is.");
 	}
 	return 0;
 }

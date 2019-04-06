@@ -31,13 +31,39 @@ extern node_t *head_who;
  *   n        - the maximum number of characters to write to the response buffer
  *
  * Returns:
- *   KB_OK, if a response was found for the intent and entity (the response is copied to the response buffer)
+ *   KB_FOUND, if a response was found for the intent and entity (the response is copied to the response buffer)
  *   KB_NOTFOUND, if no response could be found
  *   KB_INVALID, if 'intent' is not a recognised question word
  */
 int knowledge_get(const char *intent, const char *entity, char *response, int n) {
-	/* to be implemented */
-	return KB_NOTFOUND;
+	node_t *search;
+	int result = KB_NOTFOUND;
+
+	if (compare_token(intent, "what") == 0) {
+		// Intent is what.
+		search = head_what;
+	} else if (compare_token(intent, "where") == 0) {
+		// Intent is where.
+		search = head_where;
+	} else if (compare_token(intent, "who") == 0) {
+		// Intent is who.
+		search = head_who;
+	} else {
+		// Invalid intent.
+		return KB_INVALID;
+	}
+
+	while(search != NULL){
+		if (compare_token(entity, search->entity) == 0){
+			// Found response in knowledge base.
+			snprintf(response, n, "%s" , search->response);
+			result = KB_FOUND;
+			break;
+		}
+		search = search->next;
+	}
+
+	return result;
 }
 
 
@@ -96,19 +122,28 @@ int knowledge_read(FILE *f) {
 	char *f_intent, *f_entity, *f_response;
 
 	while (fgets(line, MAX_INPUT, (FILE*) f)) {
+		char *cr, *nl;
+
 		// Read line by line.
 		if (strcmp(line, "\n") == 0 || strcmp(line, "\r\n") == 0) {
 			// Empty line.
 			continue;
 		} else {
-			// Remove the new line.
-			size_t pos = (int)(strlen(line)) - 2;
-			if (compare_token(&line[pos], "\r") == 0) {
-				// macOS/ Linux: \r\n.
-				line[pos] = '\0';
+			cr = strchr(line, '\r');
+			nl = strchr(line, '\n');
+
+			if (cr != NULL) {
+				// Carriage return found, replace it with null terminator.
+				*cr = '\0';
+			} else if (nl != NULL) {
+				// newline found, replace it with null terminator.
+				*nl = '\0';
 			} else {
-				// Only \n.
-				line[pos + 1] = '\0';
+				// Clear the remaining input.
+				int c;
+				while ((c = getchar()) != '\n' && c != EOF) {
+					continue;
+				}
 			}
 
 			if (compare_token(line, "[what]") == 0) {
@@ -159,26 +194,25 @@ void knowledge_reset() {
  *   f - the file
  */
 void knowledge_write(FILE *f) {
-	/*
-		ctr:	The number of successful results saved to the file.
-	*/
-	int ctr = 0;
-	node_t * temp1 = head_what;
-	node_t * temp2 = head_where;
-	node_t * temp3 = head_who;
-	fprintf (f, "[what]\n");
-	while(temp1 != NULL){
-		fprintf (f,"%s=%s\n",temp1->entity,temp1->response);
+	node_t *temp1 = head_what;
+	node_t *temp2 = head_where;
+	node_t *temp3 = head_who;
+
+	fprintf(f, "[what]\n");
+	while(temp1 != NULL) {
+		fprintf(f,"%s=%s\n", temp1->entity, temp1->response);
 		temp1 = temp1->next;
 	}
-	fprintf (f, "[where]\n");
-	while(temp2 != NULL){
-		fprintf (f,"%s=%s\n",temp2->entity,temp2->response);
-		temp2=temp2->next;
+
+	fprintf(f, "\n[where]\n");
+	while(temp2 != NULL) {
+		fprintf(f,"%s=%s\n", temp2->entity, temp2->response);
+		temp2 = temp2->next;
 	}
-	fprintf (f, "[who]\n");
-	while(temp3 != NULL){
-		fprintf (f,"%s=%s\n",temp3->entity,temp3->response);
-		temp3=temp3->next;
+
+	fprintf(f, "\n[who]\n");
+	while(temp3 != NULL) {
+		fprintf(f,"%s=%s\n", temp3->entity, temp3->response);
+		temp3 = temp3->next;
 	}
 }
