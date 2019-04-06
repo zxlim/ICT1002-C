@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "chat1002.h"
 extern node_t *head_what;
 extern node_t *head_where;
@@ -100,8 +101,8 @@ int chatbot_main(int inc, char *inv[], char *response, int n) {
 		return chatbot_do_reset(inc, inv, response, n);
 	else if (chatbot_is_save(inv[0]))
 		return chatbot_do_save(inc, inv, response, n);
-	else if (chatbot_is_debug(inv[0]))
-		return chatbot_do_debug(inc, inv, response, n);
+	// else if (chatbot_is_debug(inv[0]))
+	// 	return chatbot_do_debug(inc, inv, response, n);
 	else {
 		snprintf(response, n, "I don't understand \"%s\".", inv[0]);
 		return 0;
@@ -388,9 +389,11 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
  *  0, otherwise
  */
 int chatbot_is_smalltalk(const char *intent) {
-	char *smalltalk[] = {"good", "bye", "hello", "it's", "hi"};
+	const char *smalltalk[] = {
+		"can", "good", "hello", "hey", "hi", "it", "its", "it's", "time"
+	};
 	
-	for (int i =0; i<5; i++) {
+	for (int i = 0; i < 9; i++) {
 		if (compare_token(intent, smalltalk[i]) == 0) {
 			return 1;
 		}
@@ -409,26 +412,40 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	char *random_bye[] = {"Bye Bye", "See you again!"};
-	char *random_hi[] = {"Hi", "Hello", "What's Up!"};
-	int hi_rand_num;
-	int bye_rand_num;
+	size_t rand_temp, rand_int;
+	const char *random_hi[] = {"Hi!", "Hello!", "Hey there!", "What's Up?"};
+	const char *random_can[] = {
+		"I don't know. Can I?", "What do you think?", "Maybe I could!", "I could always try..."
+	};
 	
-	for (int i=0; i<2;i++) {
-		bye_rand_num = rand() %2;
-	}
+	srand((unsigned)(time(NULL)));
+	rand_temp = rand();
+	rand_int = (rand() * rand_temp) % 4;
 	
-	for (int i=0; i<3;i++) {
-		hi_rand_num = rand() %3;
-	}
-	
-	if (compare_token("good", inv[0]) == 0) {
-		snprintf(response, n, "Good %s", inv[1]);
-	} else if (compare_token("bye", inv[0]) == 0) {
-		snprintf(response, n, "%s" , random_bye[bye_rand_num]);
-	} else if (compare_token("hello", inv[0]) == 0 || compare_token("hi", inv[0]) == 0) {
-		snprintf(response, n, "%s" , random_hi[hi_rand_num]);
-	} else if (compare_token("it's", inv[0])==0) {
+	if (compare_token("time", inv[0]) == 0) {
+		char the_time[24];
+		time_t timer = time(NULL);
+		strftime(the_time, 24, "%I:%M %p, %d %b %Y", localtime(&timer));
+		snprintf(response, n, "It is now %s.", the_time);
+	} else if (compare_token("good", inv[0]) == 0) {
+		if (inc > 1) {
+			snprintf(response, n, "Good %s to you too!", inv[1]);
+		} else {
+			snprintf(response, n, "Good day!");
+		}
+	} else if (
+		compare_token("hello", inv[0]) == 0 ||
+		compare_token("hey", inv[0]) == 0 ||
+		compare_token("hi", inv[0]) == 0
+	) {
+		snprintf(response, n, "%s" , random_hi[rand_int]);
+	} else if (compare_token("can", inv[0]) == 0) {
+		snprintf(response, n, "%s" , random_can[rand_int]);
+	} else if (
+		compare_token("it", inv[0]) == 0 ||
+		compare_token("its", inv[0]) == 0 ||
+		compare_token("it's", inv[0]) == 0
+	) {
 		snprintf(response, n, "Indeed it is.");
 	}
 	return 0;
@@ -438,20 +455,20 @@ int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
 /*
  * Temporary debug functions.
 */
-int chatbot_is_debug(const char *intent) {
-	return compare_token(intent, "tempdebug") == 0;
-}
+// int chatbot_is_debug(const char *intent) {
+// 	return compare_token(intent, "tempdebug") == 0;
+// }
 
-int chatbot_do_debug(int inc, char *inv[], char *response, int n) {
-	printf("\n=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
-	printf("==========[what]===========\n");
-	linkedlist_print(head_what);
-	printf("==========[where]==========\n");
-	linkedlist_print(head_where);
-	printf("===========[who]===========\n");
-	linkedlist_print(head_who);
-	printf("===========================\n\n");
-	printf("=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
-	snprintf(response, n, "Done printing debugging information.");
-	return 0;
-}
+// int chatbot_do_debug(int inc, char *inv[], char *response, int n) {
+// 	printf("\n=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+// 	printf("==========[what]===========\n");
+// 	linkedlist_print(head_what);
+// 	printf("==========[where]==========\n");
+// 	linkedlist_print(head_where);
+// 	printf("===========[who]===========\n");
+// 	linkedlist_print(head_who);
+// 	printf("===========================\n\n");
+// 	printf("=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+// 	snprintf(response, n, "Done printing debugging information.");
+// 	return 0;
+// }

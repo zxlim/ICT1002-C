@@ -119,9 +119,12 @@ int knowledge_read(FILE *f) {
 	*/
 	int ctr = 0, result;
 	char line[MAX_INPUT];
-	char *f_intent, *f_entity, *f_response;
+	char *f_intent;
 
-	while (fgets(line, MAX_INPUT, (FILE*) f)) {
+	const size_t MAX_READLEN = (size_t)(MAX_ENTITY + MAX_RESPONSE);
+
+	while (fgets(line, MAX_READLEN, (FILE*) f)) {
+		char *f_entity, *f_response;
 		char *cr, *nl;
 
 		// Read line by line.
@@ -139,23 +142,29 @@ int knowledge_read(FILE *f) {
 				// newline found, replace it with null terminator.
 				*nl = '\0';
 			} else {
-				// Clear the remaining input.
+				// Clear any remaining input to prevent overflow.
 				int c;
 				while ((c = getchar()) != '\n' && c != EOF) {
 					continue;
 				}
 			}
 
-			if (compare_token(line, "[what]") == 0) {
-				// Intent: what.
-				f_intent = "what";
-			} else if (compare_token(line, "[where]") == 0) {
-				// Intent: where.
-				f_intent = "where";
-			} else if (compare_token(line, "[who]") == 0) {
-				// Intent: who.
-				f_intent = "who";
-			} else {
+			if (strchr(line, '[') != NULL && strchr(line, ']') != NULL) {
+				// Square brackets found. Check intent.
+				if (compare_token(line, "[what]") == 0) {
+					// Intent: what.
+					f_intent = "what";
+				} else if (compare_token(line, "[where]") == 0) {
+					// Intent: where.
+					f_intent = "where";
+				} else if (compare_token(line, "[who]") == 0) {
+					// Intent: who.
+					f_intent = "who";
+				} else {
+					// Invalid intent.
+					f_intent = NULL;
+				}
+			} else if (f_intent != NULL && (strchr(line, '=') != NULL)) {
 				// Entity-Response pair line.
 				f_entity = strtok(line, "=");
 				f_response = strtok(NULL, "=");

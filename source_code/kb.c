@@ -36,7 +36,7 @@ node_t * node_create(const char *entity, const char *resp) {
 
 void linkedlist_add(node_t *head, node_t *node) {
 	/*
-		This function adds a new node to the linked list.
+		This function adds a new node to a linked list.
 
 		Arguments:
 			head 	[node_t *]:	The head node of the linked list.
@@ -48,6 +48,7 @@ void linkedlist_add(node_t *head, node_t *node) {
 		if (compare_token(current->entity, node->entity) == 0) {
 			// Entity already exist. Overwrite the response.
 			strncpy(current->response, node->response, MAX_RESPONSE);
+			break;
 		} else if (current->next == NULL) {
 			// End of linked list.
 			current->next = node;

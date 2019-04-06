@@ -25,6 +25,8 @@ $ ./chatbot1002
 ```
 
 # License and Copyright Information
+Repository content (Excluding third-party resources, see below) shall be released under the [MIT License](LICENSE).
+<br /><br />
 This project is an assignment submission for the fulfillment of the module ICT1002 Programming Fundementals.
 <br /><br />
 As such, copyright and any rights to this project shall belong to the project contributors as well as to [Singapore Institute of Technology (SIT)](https://www.singaporetech.edu.sg/).
