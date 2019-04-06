@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 					continue;
 				}
 			}
-			/* End of modification */
+			/* End of modification. */
 			
 			/* split it into words */
 			inc = 0;
@@ -158,5 +158,5 @@ void prompt_user(char *buf, int n, const char *format, ...) {
 			continue;
 		}
 	}
-	/* End of modification */
+	/* End of modification. */
 }

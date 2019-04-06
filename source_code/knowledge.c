@@ -203,25 +203,25 @@ void knowledge_reset() {
  *   f - the file
  */
 void knowledge_write(FILE *f) {
-	node_t *temp1 = head_what;
-	node_t *temp2 = head_where;
-	node_t *temp3 = head_who;
+	node_t *what = head_what;
+	node_t *where = head_where;
+	node_t *who = head_who;
 
 	fprintf(f, "[what]\n");
-	while(temp1 != NULL) {
-		fprintf(f,"%s=%s\n", temp1->entity, temp1->response);
-		temp1 = temp1->next;
+	while(what != NULL) {
+		fprintf(f, "%s=%s\n", what->entity, what->response);
+		what = what->next;
 	}
 
 	fprintf(f, "\n[where]\n");
-	while(temp2 != NULL) {
-		fprintf(f,"%s=%s\n", temp2->entity, temp2->response);
-		temp2 = temp2->next;
+	while(where != NULL) {
+		fprintf(f, "%s=%s\n", where->entity, where->response);
+		where = where->next;
 	}
 
 	fprintf(f, "\n[who]\n");
-	while(temp3 != NULL) {
-		fprintf(f,"%s=%s\n", temp3->entity, temp3->response);
-		temp3 = temp3->next;
+	while(who != NULL) {
+		fprintf(f, "%s=%s\n", who->entity, who->response);
+		who = who->next;
 	}
 }

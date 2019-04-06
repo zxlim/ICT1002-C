@@ -58,8 +58,8 @@ int chatbot_is_smalltalk(const char *intent);
 int chatbot_do_smalltalk(int inc, char *inv[], char *resonse, int n);
 
 /* Temporary debug functions. */
-// int chatbot_is_debug(const char *intent);
-// int chatbot_do_debug(int inc, char *inv[], char *response, int n);
+int chatbot_is_debug(const char *intent);
+int chatbot_do_debug(int inc, char *inv[], char *response, int n);
 /* End of temporary debug functions. */
 
 /* functions defined in knowledge.c */
@@ -70,6 +70,7 @@ int knowledge_read(FILE *f);
 void knowledge_write(FILE *f);
 
 /* Functions defined in kb.c */
+void safe_strcat(char *dest, char *src[], size_t src_size, size_t n, int offset);
 node_t * node_create(const char *entity, const char *resp);
 void linkedlist_add(node_t *head, node_t *node);
 void linkedlist_print(node_t *head);

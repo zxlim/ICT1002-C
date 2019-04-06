@@ -7,6 +7,53 @@ extern node_t *head_where;
 extern node_t *head_who;
 
 
+void safe_strcat(char *dest, char *src[], size_t src_size, size_t n, int offset) {
+	/*
+		This function safely concatenates an array of strings.
+
+		Arguments:
+			dest 		[char *]:	The pointer to the destination.
+			src 		[char *[]]:	The source array of strings.
+			src_size	[size_t]:	The number of elements in src.
+			n			[size_t]:	The maximum size of the destination.
+			offset		[int]:		The position of src to start from.
+	*/
+	size_t len_check, remainder, last;
+
+	for (int i = offset; i < src_size; i++) {
+		if (i != (src_size - 1)) {
+			// Account for additional space.
+			len_check = strlen(dest) + strlen(src[i]) + 1;
+		} else {
+			len_check = strlen(dest) + strlen(src[i]);
+		}
+
+		if (len_check < n) {
+			// "dest" still has space for the next string.
+			strncat(dest, src[i], n);
+
+			if (i != (src_size - 1)) {
+				// Add a space between words.
+				strcat(dest, " ");
+			}
+		} else {
+			// Not enough space to store the current string.
+			remainder = n - strlen(dest);
+
+			if (remainder > 0) {
+				strncat(dest, src[i], remainder);
+			}
+			// No more space for more strings, break.
+			break;
+		}
+	}
+
+	// In case string isn't null terminated.
+	last = strlen(dest);
+	dest[last] = '\0';
+}
+
+
 node_t * node_create(const char *entity, const char *resp) {
 	/*
 		This function creates a node.
@@ -26,8 +73,8 @@ node_t * node_create(const char *entity, const char *resp) {
 		return NULL;
 	}
 
-	strncpy(node->entity, entity, MAX_ENTITY);
-	strncpy(node->response, resp, MAX_RESPONSE);
+	snprintf(node->entity, MAX_ENTITY, "%s", entity);
+	snprintf(node->response, MAX_RESPONSE, "%s", resp);
 	node->next = NULL;
 
 	return node;
@@ -47,7 +94,7 @@ void linkedlist_add(node_t *head, node_t *node) {
 	while (current != NULL) {
 		if (compare_token(current->entity, node->entity) == 0) {
 			// Entity already exist. Overwrite the response.
-			strncpy(current->response, node->response, MAX_RESPONSE);
+			snprintf(current->response, MAX_RESPONSE, "%s", node->response);
 			break;
 		} else if (current->next == NULL) {
 			// End of linked list.
@@ -68,12 +115,13 @@ void linkedlist_print(node_t *head) {
 		Arguments:
 			head 	[node_t *]:	The head node of the linked list.
 	*/
-	node_t *current = head;
+	/* FUNCTION CURRENTLY NOT IN USE. */
+	// node_t *current = head;
 
-	while (current != NULL) {
-		printf("[%s] %s\n", current->entity, current->response);
-		current = current->next;
-	}
+	// while (current != NULL) {
+	// 	printf("[%s] %s\n", current->entity, current->response);
+	// 	current = current->next;
+	// }
 }
 
 
