@@ -128,7 +128,10 @@ int knowledge_read(FILE *f) {
 		char *cr, *nl;
 
 		// Read line by line.
-		if (strcmp(line, "\n") == 0 || strcmp(line, "\r\n") == 0) {
+		if (
+			strcmp(line, "\n") == 0 ||
+			strcmp(line, "\r\n") == 0
+		) {
 			// Empty line.
 			continue;
 		} else {
@@ -149,7 +152,10 @@ int knowledge_read(FILE *f) {
 				}
 			}
 
-			if (strchr(line, '[') != NULL && strchr(line, ']') != NULL) {
+			if (
+				strchr(line, '[') != NULL &&
+				strchr(line, ']') != NULL
+			) {
 				// Square brackets found. Check intent.
 				if (compare_token(line, "[what]") == 0) {
 					// Intent: what.
@@ -164,7 +170,10 @@ int knowledge_read(FILE *f) {
 					// Invalid intent.
 					f_intent = NULL;
 				}
-			} else if (f_intent != NULL && (strchr(line, '=') != NULL)) {
+			} else if (
+				f_intent != NULL &&
+				strchr(line, '=') != NULL
+			) {
 				// Entity-Response pair line.
 				f_entity = strtok(line, "=");
 				f_response = strtok(NULL, "=");
@@ -207,20 +216,23 @@ void knowledge_write(FILE *f) {
 	node_t *where = head_where;
 	node_t *who = head_who;
 
+	// Save "what" intent's entitiy-responses.
 	fprintf(f, "[what]\n");
-	while(what != NULL) {
+	while (what != NULL) {
 		fprintf(f, "%s=%s\n", what->entity, what->response);
 		what = what->next;
 	}
 
+	// Save "where" intent's entitiy-responses.
 	fprintf(f, "\n[where]\n");
-	while(where != NULL) {
+	while (where != NULL) {
 		fprintf(f, "%s=%s\n", where->entity, where->response);
 		where = where->next;
 	}
 
+	// Save "what" intent's entitiy-responses.
 	fprintf(f, "\n[who]\n");
-	while(who != NULL) {
+	while (who != NULL) {
 		fprintf(f, "%s=%s\n", who->entity, who->response);
 		who = who->next;
 	}

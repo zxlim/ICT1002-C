@@ -68,7 +68,6 @@ void knowledge_write(FILE *f);
 void safe_strcat(char *dest, char *src[], size_t src_size, size_t n, int offset);
 node_t * node_create(const char *entity, const char *resp);
 void linkedlist_add(node_t *head, node_t *node);
-void linkedlist_print(node_t *head);
 void linkedlist_free(node_t *node);
 int kb_update_what(node_t *new_node);
 int kb_update_where(node_t *new_node);

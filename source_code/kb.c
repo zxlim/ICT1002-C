@@ -107,24 +107,6 @@ void linkedlist_add(node_t *head, node_t *node) {
 }
 
 
-void linkedlist_print(node_t *head) {
-	/*
-		This function prints out the word value of all nodes in a linked list.
-		For debugging use only.
-
-		Arguments:
-			head 	[node_t *]:	The head node of the linked list.
-	*/
-	/* FUNCTION CURRENTLY NOT IN USE. */
-	// node_t *current = head;
-
-	// while (current != NULL) {
-	// 	printf("[%s] %s\n", current->entity, current->response);
-	// 	current = current->next;
-	// }
-}
-
-
 void linkedlist_free(node_t *node) {
 	/*
 		This function attempts to free up all nodes in a linked list.
