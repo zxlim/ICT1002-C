@@ -56,7 +56,7 @@ extern node_t *head_who;
  * Returns: the name of the chatbot as a null-terminated string
  */
 const char *chatbot_botname() {
-	return "C-hatbot";
+	return "Chatbot";
 }
 
 
@@ -101,6 +101,8 @@ int chatbot_main(int inc, char *inv[], char *response, int n) {
 		return chatbot_do_reset(inc, inv, response, n);
 	else if (chatbot_is_save(inv[0]))
 		return chatbot_do_save(inc, inv, response, n);
+	// else if (chatbot_is_debug(inv[0]))
+	// 	return chatbot_do_debug(inc, inv, response, n);
 	else {
 		snprintf(response, n, "I don't understand \"%s\".", inv[0]);
 		return 0;
@@ -232,21 +234,49 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 		enti:		A string to store the entity.
 		ans:		A string to store the answer to the question.
 	*/
+	int i = 1;
 	char unsure[MAX_RESPONSE] = "I don't know. ";
 	char enti[MAX_ENTITY] = "";
 	char ans[MAX_RESPONSE] = "";
-
-	size_t offset = 1;
 	
 	// Check where does the question start.
 	if (compare_token(inv[1], "is") == 0 || compare_token(inv[1], "are") == 0) {
-		offset = 2;
+		i = 2;
 	}
 
-	safe_strcat(enti, inv, inc, (MAX_ENTITY - 1), offset);
+	// Store the entity as "enti" variable.
+	for (; i < inc; i++) {
+		size_t after_check = (size_t)(strlen(enti) + strlen(inv[i]));
+
+		if (after_check < MAX_ENTITY) {
+			// "enti" still has space for the next word.
+			strcat(enti, inv[i]);
+
+			if (i != (inc - 1)) {
+				// Add a space between words.
+				strcat(enti, " ");
+			}
+		} else {
+			// Not enough space to store the word and subsequent words.
+			size_t remainder = (size_t)(MAX_ENTITY - (int)(strlen(enti)));
+			if (remainder > 0) {
+				strncat(enti, inv[i], remainder);
+			}
+			break;
+		}
+	}
 
 	if (knowledge_get(inv[0], enti, response, n) == KB_NOTFOUND) {
-		safe_strcat(unsure, inv, inc, (MAX_RESPONSE - 1), 0);
+		// Can't find response. Form string to ask for response.
+		for (int j = 0; j < inc; j++) {
+			strcat(unsure, inv[j]);
+
+			if (j != (inc - 1)) {
+				// Add a space between words.
+				strcat(unsure, " ");
+			}
+		}
+		// Account for question mark at end of string.
 		strcat(unsure, "?");
 
 		prompt_user(ans, MAX_RESPONSE, "%s", unsure);
@@ -319,12 +349,13 @@ int chatbot_is_save(const char *intent) {
 int chatbot_do_save(int inc, char *inv[], char *response, int n) {
 	/*
 		fp:		The file pointer.
+
 	*/
 	FILE *fp;
 	char file_path[MAX_INPUT];
 
 	// Get the file path from the user input.
-	if (compare_token(inv[1], "to") == 0) {
+	if (compare_token(inv[1], "to") == 0 || compare_token(inv[1], "as") == 0) {
 		// Save[0] to[1] /path/to/file[2]
 		strcpy(file_path, inv[2]);
 	} else {
@@ -383,10 +414,13 @@ int chatbot_is_smalltalk(const char *intent) {
  *   1, if the chatbot should stop chatting (e.g. the smalltalk was "goodbye" etc.)
  */
 int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
-	const char *random_hi[] = {"Hi!", "Hello!", "Hello there!", "Hey hey~", "What's Up!!"};
-	const char *random_can[] = {"What do you think?", "Maybe I could!", "Well, it's either a yes or a no."};
+	size_t rand_int;
+	const char *random_hi[] = {"Hi!", "Hello!", "Hey there!", "What's Up?"};
+	const char *random_can[] = {
+		"I don't know. Can I?", "What do you think?", "Maybe I could!", "I could always try..."
+	};
 
-	size_t rand_int = (size_t)(rand() % 5);
+	rand_int = (size_t)(rand() % 4);
 	
 	if (compare_token("time", inv[0]) == 0) {
 		char the_time[24];
@@ -406,21 +440,7 @@ int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
 	) {
 		snprintf(response, n, "%s" , random_hi[rand_int]);
 	} else if (compare_token("can", inv[0]) == 0) {
-		if (rand_int == 3) {
-			if (compare_token(inv[1], "you") == 0) {
-				snprintf(response, n, "I don't know, can I?");
-			} else if (compare_token(inv[1], "i") == 0) {
-				snprintf(response, n, "I don't know, can you?");
-			} else {
-				snprintf(response, n, "I don't know, can it?");
-			}
-		} else if (rand_int == 4) {
-			char qns[MAX_INPUT] = "";
-			safe_strcat(qns, inv, inc, (MAX_INPUT - 1), 0);
-			snprintf(response, n, "Think about it, %s?", qns);
-		} else {
-			snprintf(response, n, "%s", random_can[rand_int]);
-		}
+		snprintf(response, n, "%s" , random_can[rand_int]);
 	} else if (
 		compare_token("it", inv[0]) == 0 ||
 		compare_token("its", inv[0]) == 0 ||
@@ -430,3 +450,25 @@ int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
 	}
 	return 0;
 }
+
+
+/*
+ * Temporary debug functions.
+*/
+// int chatbot_is_debug(const char *intent) {
+// 	return compare_token(intent, "tempdebug") == 0;
+// }
+
+// int chatbot_do_debug(int inc, char *inv[], char *response, int n) {
+// 	printf("\n=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+// 	printf("==========[what]===========\n");
+// 	linkedlist_print(head_what);
+// 	printf("==========[where]==========\n");
+// 	linkedlist_print(head_where);
+// 	printf("===========[who]===========\n");
+// 	linkedlist_print(head_who);
+// 	printf("===========================\n\n");
+// 	printf("=====[ TEMPORARY DEBUG MODE! REMOVE BEFORE SUBMISSION ]=====\n\n");
+// 	snprintf(response, n, "Done printing debugging information.");
+// 	return 0;
+// }
